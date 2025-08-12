@@ -1,6 +1,5 @@
 CC = gcc
 CFLAGS = -Wall -Werror
-LD = ld
 
 CDFLAGS = -pg -g
 CRFLAGS = -O3
@@ -12,14 +11,9 @@ lib_debug: lib
 lib_release: CFLAGS += $(CRFLAGS)
 lib_release: lib
 
-lib: bin/not_enough_cli.o
+lib: not_enough_cli.c not_enough_cli.h
 	mkdir -p bin
-	$(LD) -r $^ -o bin/lib.o
-
-%.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-bin/not_enough_cli.o: not_enough_cli.c
+	$(CC) $(CFLAGS) -c not_enough_cli.c -o bin/lib.o
 
 clean:
 	rm -fr bin

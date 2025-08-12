@@ -26,7 +26,6 @@ static opt *options_long_ = NULL;
 static char *options_short = NULL;
 static char **options_help_ = NULL;
 static char *prog_name_ = NULL;
-static char *opts_given_ = NULL;
 static int smallest_option = 0;
 static int largest_option = 0;
 static int option_count = 0;
