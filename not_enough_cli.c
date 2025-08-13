@@ -31,7 +31,7 @@ static int largest_option = 0;
 static int option_count = 0;
 static int *options = NULL;
 
-void nac_set_opt(char opt) { options[((unsigned)opt) - smallest_option] = 1; }
+void nac_set_opt(char opt) { options[((unsigned)opt) - smallest_option]++; }
 int nac_get_opt(char opt) { return options[((unsigned)opt) - smallest_option]; }
 
 void nac_set_opts(char *prog_name, opt *options_long, char **options_help) {
@@ -60,7 +60,7 @@ void nac_set_opts(char *prog_name, opt *options_long, char **options_help) {
     errx(EXIT_FAILURE, "not_enough_cli: number of options cannot be 0");
   }
 
-  options = calloc(largest_option - smallest_option, sizeof(int));
+  options = calloc(largest_option - smallest_option + 1, sizeof(int));
   options_short = malloc(options_short_len + 1);
   char *s = options_short;
 
