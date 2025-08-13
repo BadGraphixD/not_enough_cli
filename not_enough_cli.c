@@ -84,6 +84,10 @@ void nac_cleanup() {
   options_short = NULL;
 }
 
+void nac_print_usage_header(FILE *fout, char *opts) {
+  fprintf(fout, "Usage: %s %s\n", prog_name_, opts);
+}
+
 void nac_print_options(FILE *fout) {
   int longest_opt_len = 0;
   for (opt *opt = options_long_; opt->name != NULL; opt++) {
@@ -143,47 +147,58 @@ static char *opt_format(char short_opt) {
   return buf;
 }
 
-void nac_opt_check_excl(char opt) {
-  if (!nac_get_opt(opt)) {
-    return;
-  }
-  for (int i = smallest_option; i < largest_option; i++) {
-    if (i == opt) {
-      continue;
+void nac_opt_check_excl(char *opts) {
+  while (*opts != '\0') {
+    if (!nac_get_opt(*opts)) {
+      return;
     }
-    if (nac_get_opt(opt)) {
-      errx(EXIT_FAILURE, "%s can be given only by itself\n", opt_format(opt));
+    for (int i = smallest_option; i < largest_option; i++) {
+      if (i == *opts) {
+        continue;
+      }
+      if (nac_get_opt(*opts)) {
+        errx(EXIT_FAILURE, "%s can be given only by itself\n",
+             opt_format(*opts));
+      }
     }
+    opts++;
   }
 }
 
-void nac_opt_check_mut_excl(char opt, char *opts) {
-  if (!nac_get_opt(opt)) {
-    return;
-  }
+void nac_opt_check_mut_excl(char *opts, char *other_opts) {
   while (*opts != '\0') {
-    if (nac_get_opt((unsigned)*opts)) {
-      errx(EXIT_FAILURE, "%s and %s are mutually exclusive\n", opt_format(opt),
+    if (!nac_get_opt(*opts)) {
+      return;
+    }
+    while (*other_opts != '\0') {
+      if (nac_get_opt((unsigned)*other_opts)) {
+        errx(EXIT_FAILURE, "%s and %s are mutually exclusive\n",
+             opt_format(*opts), opt_format(*other_opts));
+      }
+      other_opts++;
+    }
+    opts++;
+  }
+}
+
+void nac_opt_check_max_once(char *opts) {
+  while (*opts != '\0') {
+    if (nac_get_opt(*opts) > 1) {
+      errx(EXIT_FAILURE, "%s cannot be used multiple times\n",
            opt_format(*opts));
     }
     opts++;
   }
 }
 
-void nac_opt_check_max_once(char opt) {
-  if (nac_get_opt(opt) > 1) {
-    errx(EXIT_FAILURE, "%s cannot be used multiple times\n", opt_format(opt));
-  }
-}
-
 char *nac_optarg_trimmed() { return SKIP_WS(optarg); }
 
-_Noreturn static void missing_arg(int opt) {
+_Noreturn void nac_missing_arg(int opt) {
   errx(EXIT_FAILURE, "\"%s\" requires an argument\n",
        opt_format(opt == ':' ? optopt : opt));
 }
 
-_Noreturn static void invalid_opt(char **argv) {
+_Noreturn static void nac_invalid_opt(char **argv) {
   const char *invalid_opt = (argv)[optind - 1];
   if (invalid_opt != NULL && strncmp(invalid_opt, "--", 2) == 0) {
     fprintf(stderr, "\"%s\": invalid option", invalid_opt + 2);
@@ -202,9 +217,9 @@ void nac_simple_parse_args(int *argc, char ***argv, void (*cb)(char)) {
     }
     switch (opt) {
     case ':':
-      missing_arg(opt);
+      nac_missing_arg(opt);
     case '?':
-      invalid_opt(*argv);
+      nac_invalid_opt(*argv);
     default:
       nac_set_opt(opt);
       cb(opt);
