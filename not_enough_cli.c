@@ -152,13 +152,12 @@ void nac_opt_check_excl(char *opts) {
     if (!nac_get_opt(*opts)) {
       return;
     }
-    for (int i = smallest_option; i < largest_option; i++) {
+    for (int i = smallest_option; i <= largest_option; i++) {
       if (i == *opts) {
         continue;
       }
-      if (nac_get_opt(*opts)) {
-        errx(EXIT_FAILURE, "%s can be given only by itself\n",
-             opt_format(*opts));
+      if (nac_get_opt(i)) {
+        errx(EXIT_FAILURE, "%s can be given only by itself", opt_format(*opts));
       }
     }
     opts++;
@@ -172,7 +171,7 @@ void nac_opt_check_mut_excl(char *opts, char *other_opts) {
     }
     while (*other_opts != '\0') {
       if (nac_get_opt((unsigned)*other_opts)) {
-        errx(EXIT_FAILURE, "%s and %s are mutually exclusive\n",
+        errx(EXIT_FAILURE, "%s and %s are mutually exclusive",
              opt_format(*opts), opt_format(*other_opts));
       }
       other_opts++;
@@ -184,8 +183,7 @@ void nac_opt_check_mut_excl(char *opts, char *other_opts) {
 void nac_opt_check_max_once(char *opts) {
   while (*opts != '\0') {
     if (nac_get_opt(*opts) > 1) {
-      errx(EXIT_FAILURE, "%s cannot be used multiple times\n",
-           opt_format(*opts));
+      errx(EXIT_FAILURE, "%s cannot be used multiple times", opt_format(*opts));
     }
     opts++;
   }
@@ -194,7 +192,7 @@ void nac_opt_check_max_once(char *opts) {
 char *nac_optarg_trimmed() { return SKIP_WS(optarg); }
 
 _Noreturn void nac_missing_arg(int opt) {
-  errx(EXIT_FAILURE, "\"%s\" requires an argument\n",
+  errx(EXIT_FAILURE, "\"%s\" requires an argument",
        opt_format(opt == ':' ? optopt : opt));
 }
 
