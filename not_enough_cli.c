@@ -148,7 +148,7 @@ static char *opt_format(char short_opt) {
 }
 
 void nac_opt_check_excl(char *opts) {
-  while (*opts != '\0') {
+  for (; *opts != '\0'; opts++) {
     if (!nac_get_opt(*opts)) {
       continue;
     }
@@ -160,7 +160,6 @@ void nac_opt_check_excl(char *opts) {
         errx(EXIT_FAILURE, "%s can be given only by itself", opt_format(*opts));
       }
     }
-    opts++;
   }
 }
 
