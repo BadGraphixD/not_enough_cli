@@ -150,7 +150,7 @@ static char *opt_format(char short_opt) {
 void nac_opt_check_excl(char *opts) {
   while (*opts != '\0') {
     if (!nac_get_opt(*opts)) {
-      return;
+      continue;
     }
     for (int i = smallest_option; i < largest_option; i++) {
       if (i == *opts) {
