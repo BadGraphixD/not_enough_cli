@@ -47,7 +47,7 @@ void nac_set_opts(char *prog_name, opt *options_long, char **options_help) {
   smallest_option = 255;
   largest_option = 0;
   option_count = 0;
-  int options_short_len = 0;
+  int options_short_len = 1;
 
   for (opt *opt = options_long_; opt->name != NULL; opt++) {
     smallest_option = MIN(smallest_option, opt->val);
